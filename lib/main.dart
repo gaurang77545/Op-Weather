@@ -1,115 +1,309 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-void main() {
-  runApp(const MyApp());
-}
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart';
+import 'package:date_format/date_format.dart';
+import 'package:intl/intl.dart';
+
+void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      debugShowCheckedModeBanner: false,
+      home: Home(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
+class Home extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _HomeState createState() => _HomeState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _HomeState extends State<Home> {
+  double h = 0.0, w = 0.0;
+  List<String> months = [
+    'jan',
+    'feb',
+    'mar',
+    'apr',
+    'may',
+    'jun',
+    'jul',
+    'aug',
+    'sep',
+    'oct',
+    'nov',
+    'dec'
+  ];
+  String currentAddress = 'My Address';
+  Position? currentposition;
+  String temperature = 'Weather';
+  String weather = '';
+  String city = '';
+  String max = '';
+  String min = '';
+  String apparenttemp = '';
+  String humidity = '';
+  String windspeed = '';
+  String visibility = '';
+  String airpressure = '';
+  String clouds = '';
+  String date = DateTime.now().day.toString() +
+      '  ' +
+      DateFormat.MMMM().format(DateTime.now()).toString() +
+      '  ' +
+      DateFormat('EEEE').format(DateTime.now()) +
+      '  ';
 
-  void _incrementCounter() {
+  @override
+  void initState() {
+    // TODO: implement initState
+    _determinePosition();
+    super.initState();
+  }
+
+  Future<void> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      Fluttertoast.showToast(msg: 'Please enable Your Location Service');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        Fluttertoast.showToast(msg: 'Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      Fluttertoast.showToast(
+          msg:
+              'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    print(Position);
+    try {
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+
+      Placemark place = placemarks[0];
+
+      setState(() {
+        currentposition = position;
+        currentAddress =
+            "${place.locality}, ${place.postalCode}, ${place.country}";
+        city = place.locality.toString();
+      });
+      getData();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void getData() async {
+    String url = 'https://api.openweathermap.org/data/2.5/weather?lat=' +
+        currentposition!.latitude.toString() +
+        '&lon=' +
+        currentposition!.longitude.toString() +
+        '&appid=b00a6fcec885b5e53be85ac4d7847543';
+    print(url);
+    Response response = await get(Uri.parse(url));
+    Map data = jsonDecode(response.body);
+    String temp = double.parse((data['main']['temp'] - 273).toString())
+        .toStringAsPrecision(2);
+    String weathero = (data['weather'][0]['main']).toString();
+    String maxo = double.parse((data['main']['temp_max'] - 273).toString())
+        .toStringAsPrecision(2);
+    String mino = double.parse((data['main']['temp_min'] - 273).toString())
+        .toStringAsPrecision(2);
+    String apparenttempo =
+        double.parse((data['main']['feels_like'] - 273).toString())
+            .toStringAsPrecision(2);
+    String humidityo =
+        double.parse((data['main']['humidity']).toString()).toString();
+    String airpressureo =
+        double.parse((data['main']['pressure']).toString()).toString();
+    String visibilityo =
+        double.parse((data['visibility'] / 1000).toString()).toString();
+
+    String windspeedo =
+        double.parse((data['wind']['speed']).toString()).toString();
+    String cloudso =
+        double.parse((data['clouds']['all']).toString()).toString();
+    print(temp);
+   
+    print(DateTime.fromMillisecondsSinceEpoch( 1647960048*1000));
+    print(DateTime.fromMillisecondsSinceEpoch(1648065600*1000));
+    print(DateTime.fromMillisecondsSinceEpoch(1648152000*1000));
+    
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      temperature = temp;
+      weather = weathero;
+      max = maxo;
+      min = mino;
+      apparenttemp = apparenttempo;
+      windspeed = windspeedo;
+      humidity = humidityo;
+      airpressure = airpressureo;
+      visibility = visibilityo;
+      clouds = cloudso;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    var size = MediaQuery.of(context).size;
+    h = size.height;
+    w = size.width;
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+        appBar: AppBar(
+          title: Text(
+            city,
+            style: TextStyle(letterSpacing: 2, color: Colors.white),
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+        body: weather == ''
+            ? Center(child: CircularProgressIndicator())
+            : Container(
+                padding: EdgeInsets.only(left: w * 0.02),
+                child: ListView(
+                  //crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: h * 0.1,
+                    ),
+                    Row(
+                      //crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          temperature,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 60),
+                        ),
+                        SizedBox(
+                          width: w * 0.02,
+                        ),
+                        Column(
+                          children: [
+                            Text(
+                              '\u2103 ',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            SizedBox(
+                              height: h * 0.01,
+                            ),
+                            Text(
+                              weather,
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                    SizedBox(
+                      height: h * 0.01,
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          date,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                        Text(max + '\u2103 ' + ' / ' + min + '\u2103 ',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13))
+                      ],
+                    ),
+                    SizedBox(
+                      height: h * 0.03,
+                    ),
+                    Text(
+                      'Weather details',
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: h * 0.03,
+                    ),
+                    Container(
+                      width: w - w * 0.03,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          details(
+                              'Apparent temperature', apparenttemp + '\u2103 '),
+                          SizedBox(
+                            width: w * 0.1,
+                          ),
+                          details('Humidity', humidity + ' %'),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: h * 0.03,
+                    ),
+                    Container(
+                      width: w - w * 0.03,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          details('Visibility', visibility + ' km '),
+                          SizedBox(
+                            width: w * 0.3,
+                          ),
+                          details('Air Pressure', airpressure + ' hPa '),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: h * 0.03,
+                    ),
+                    Container(
+                      width: w - w * 0.03,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          details('Wind speed', windspeed + ' m/s'),
+                          SizedBox(
+                            width: w * 0.3,
+                          ),
+                          details('Cloudiness', clouds + ' % '),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ));
+  }
+
+  Widget details(String title, String contents) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(fontWeight: FontWeight.w300, fontSize: 18),
+        ),
+        SizedBox(
+          height: h * 0.01,
+        ),
+        Text(contents,
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 25))
+      ],
     );
   }
 }
