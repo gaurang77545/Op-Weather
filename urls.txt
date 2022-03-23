@@ -1,0 +1,8 @@
+One Call API
+https://api.openweathermap.org/data/2.5/onecall?lat=37.4219983&lon=-122.084&exclude=minutely,hourly&appid=b00a6fcec885b5e53be85ac4d7847543
+
+Current Weather Data
+https://api.openweathermap.org/data/2.5/weather?lat=37.4219983&lon=-122.084&appid=b00a6fcec885b5e53be85ac4d7847543
+
+Historical Data
+https://history.openweathermap.org/data/2.5/history/city?lat=37.4219983&lon=-122.084&type=hour&start=1645615937&end=1648035137&appid=b00a6fcec885b5e53be85ac4d7847543
