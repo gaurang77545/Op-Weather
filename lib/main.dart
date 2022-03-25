@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
@@ -7,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart';
 import 'package:date_format/date_format.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() => runApp(new MyApp());
 
@@ -60,7 +60,10 @@ class _HomeState extends State<Home> {
       '  ' +
       DateFormat('EEEE').format(DateTime.now()) +
       '  ';
-
+  var historicalDates = [];
+  var historicalDatesTemp = [];
+  var iconurls = [];
+  var historicdesc = [];
   @override
   void initState() {
     // TODO: implement initState
@@ -118,7 +121,30 @@ class _HomeState extends State<Home> {
         '&lon=' +
         currentposition!.longitude.toString() +
         '&appid=b00a6fcec885b5e53be85ac4d7847543';
-    print(url);
+    DateTime currentPhoneDate = DateTime.now();
+    for (int i = 0; i < 6; i++) {
+      Timestamp myTimeStamp =
+          Timestamp.fromDate(currentPhoneDate.subtract(Duration(days: i)));
+      historicalDatesTemp
+          .add(await gethistoricaldata(myTimeStamp.seconds.toString()));
+      String date = DateTime.now().subtract(Duration(days: i)).day.toString() +
+          '  ' +
+          DateFormat.MMMM()
+              .format(DateTime.now().subtract(Duration(days: i)))
+              .toString() +
+          '  ' +
+          DateFormat('EEEE')
+              .format(DateTime.now().subtract(Duration(days: i)))
+              .toString()
+              .substring(0, 3);
+      // historicalDates.add(DateFormat('dd-MM-yyyy')
+      //     .format(DateTime.now().subtract(Duration(days: i)))
+      //     .toString());
+      historicalDates.add(date);
+    }
+    // print(historicalDates);
+    print(iconurls);
+    // print(url);
     Response response = await get(Uri.parse(url));
     Map data = jsonDecode(response.body);
     String temp = double.parse((data['main']['temp'] - 273).toString())
@@ -143,11 +169,11 @@ class _HomeState extends State<Home> {
     String cloudso =
         double.parse((data['clouds']['all']).toString()).toString();
     print(temp);
-   
-    print(DateTime.fromMillisecondsSinceEpoch( 1647960048*1000));
-    print(DateTime.fromMillisecondsSinceEpoch(1648065600*1000));
-    print(DateTime.fromMillisecondsSinceEpoch(1648152000*1000));
-    
+
+    // print(DateTime.fromMillisecondsSinceEpoch(1647960048 * 1000));
+    // print(DateTime.fromMillisecondsSinceEpoch(1648065600 * 1000));
+    // print(DateTime.fromMillisecondsSinceEpoch(1648152000 * 1000));
+
     setState(() {
       temperature = temp;
       weather = weathero;
@@ -160,6 +186,29 @@ class _HomeState extends State<Home> {
       visibility = visibilityo;
       clouds = cloudso;
     });
+  }
+
+  Future<String> gethistoricaldata(String timestamp) async {
+    String urlhistory =
+        'https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=' +
+            currentposition!.latitude.toString() +
+            '&lon=' +
+            currentposition!.longitude.toString() +
+            '&dt=' +
+            timestamp +
+            '&appid=b00a6fcec885b5e53be85ac4d7847543';
+
+    print(urlhistory);
+    Response response = await get(Uri.parse(urlhistory));
+    Map data = jsonDecode(response.body);
+    String temp = double.parse((data['current']['temp'] - 273).toString())
+        .toStringAsPrecision(2);
+    String iconcode = data['current']['weather'][0]['icon'];
+    var iconurl = "http://openweathermap.org/img/w/" + iconcode + ".png";
+    iconurls.add(iconurl);
+    String weather = data['current']['weather'][0]['main'];
+    historicdesc.add(weather);
+    return temp;
   }
 
   @override
@@ -231,6 +280,45 @@ class _HomeState extends State<Home> {
                     SizedBox(
                       height: h * 0.03,
                     ),
+                    Container(
+                      height: h * 0.1,
+                      width: w * 0.5,
+                      child: const Divider(
+                        thickness: 2, // thickness of the line
+                        indent:
+                            20, // empty space to the leading edge of divider.
+                        endIndent:
+                            20, // empty space to the trailing edge of the divider.
+                        color: Colors
+                            .black, // The color to use when painting the line.
+                      ),
+                    ),
+                    Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'DATE',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 15),
+                            ),
+                            Text(
+                              'Desc',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 15),
+                            ),
+                            Text('Temp',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 15)),
+                          ],
+                        ),
+                      ],
+                    ),
+                    datetemp(historicalDatesTemp[1], historicalDates[1],
+                        historicdesc[1], iconurls[1]),
+                    datetemp(historicalDatesTemp[0], historicalDates[0],
+                        historicdesc[0], iconurls[0]),
                     Text(
                       'Weather details',
                       style:
@@ -303,6 +391,39 @@ class _HomeState extends State<Home> {
         ),
         Text(contents,
             style: TextStyle(fontWeight: FontWeight.w900, fontSize: 25))
+      ],
+    );
+  }
+
+  Widget datetemp(String temp, String date, String desc, String iconurl) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text(
+          date,
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        ),
+        SizedBox(
+          width: w * 0.17,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Image.network(
+              iconurl,
+              width: 30.0,
+              height: 30,
+            ),
+            Text(
+              desc,
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+            )
+          ],
+        ),
+        SizedBox(
+          width: w * 0.31,
+        ),
+        Text(temp, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15))
       ],
     );
   }

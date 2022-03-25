@@ -90,19 +90,23 @@ def train_data():
     #X_train=X_train.values.reshape(-1,1)
     scaler = preprocessing.StandardScaler().fit(X_train)
     X_train_scaled = scaler.transform(X_train)
-    
-    pipeline = make_pipeline(preprocessing.StandardScaler(), 
-                            RandomForestRegressor(n_estimators=25,random_state=123))
-
-    hyperparameters = { 'randomforestregressor__max_features' : ['auto', 'sqrt', 'log2'],
-                    'randomforestregressor__max_depth': [None, 5, 3, 1], }
-
+    regressor = RandomForestRegressor(n_estimators=25,random_state=123)
+    regressor.fit(X_train_scaled, y_train) 
+   # hyperparameters = { 'randomforestregressor__max_features' : ['auto', 'sqrt', 'log2'],
+    #                'randomforestregressor__max_depth': [None, 5, 3, 1], }
+    #Y_pred = regressor.predict(X_test)
+    #print(Y_pred)
     clf = LinearRegression()
     clf.fit(X_train, y_train)
     pred = clf.predict(X_test)
     print ("R2 Score is"+str(r2_score(y_test, pred)))
-    print ("Mean Squared Error is"+str(mean_squared_error(y_test, pred)))
+    print ("Mean Squared Error is"+str(mean_squared_error(y_test,pred)))
     joblib.dump(clf, 'weather_predictor.pkl')
+
+    RandomForestRegressor(n_estimators = 100, random_state = 0)
+ 
+# fit the regressor with x and y data
+
     
 # Enter your API key
 api_key = "b00a6fcec885b5e53be85ac4d7847543"
