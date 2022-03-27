@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -60,10 +61,11 @@ class _HomeState extends State<Home> {
       '  ' +
       DateFormat('EEEE').format(DateTime.now()) +
       '  ';
-  var historicalDates = [];
-  var historicalDatesTemp = [];
-  var iconurls = [];
-  var historicdesc = [];
+  List<String> historicalDates = [];
+  List<String> historicalDatesTemp = [];
+  List<String> iconurls = [];
+  List<String> historicdesc = [];
+  List<Map<String, String>> futuredata = [];
   @override
   void initState() {
     // TODO: implement initState
@@ -109,20 +111,21 @@ class _HomeState extends State<Home> {
             "${place.locality}, ${place.postalCode}, ${place.country}";
         city = place.locality.toString();
       });
-      getData();
+      await getData();
+      getFuturedata();
     } catch (e) {
       print(e);
     }
   }
 
-  void getData() async {
+  Future<void> getData() async {
     String url = 'https://api.openweathermap.org/data/2.5/weather?lat=' +
         currentposition!.latitude.toString() +
         '&lon=' +
         currentposition!.longitude.toString() +
         '&appid=b00a6fcec885b5e53be85ac4d7847543';
     DateTime currentPhoneDate = DateTime.now();
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 2; i++) {
       Timestamp myTimeStamp =
           Timestamp.fromDate(currentPhoneDate.subtract(Duration(days: i)));
       historicalDatesTemp
@@ -211,6 +214,75 @@ class _HomeState extends State<Home> {
     return temp;
   }
 
+  Future<void> getFuturedata() async {
+    await addFutureData(1);
+    await addFutureData(2);
+    await addFutureData(3);
+    await addFutureData(4);
+    await addFutureData(5);
+    // for (int i = 0; i < 5; i++) {
+    //   historicalDates.add(futuredata[i]['dt']!);
+    //   historicalDatesTemp.add(futuredata[i]['temp']!);
+    //   iconurls.add(futuredata[i]['url']!);
+    //   historicdesc.add(futuredata[i]['desc']!);
+    // }
+    print(historicalDates);
+    setState(() {
+      
+    });
+  }
+
+  Future<void> addFutureData(int i) async {
+    String urlhistory = 'https://api.openweathermap.org/data/2.5/onecall?lat=' +
+        currentposition!.latitude.toString() +
+        '&lon=' +
+        currentposition!.longitude.toString() +
+        '&exclude=minutely,hourly&' +
+        '&appid=b00a6fcec885b5e53be85ac4d7847543';
+    Response response = await get(Uri.parse(urlhistory));
+    Map data = jsonDecode(response.body);
+    String date = DateTime.fromMillisecondsSinceEpoch(
+                data["daily"][i]["dt"] * 1000)
+            .day
+            .toString() +
+        '  ' +
+        DateFormat.MMMM()
+            .format(DateTime.fromMillisecondsSinceEpoch(
+                data["daily"][i]["dt"] * 1000))
+            .toString() +
+        '  ' +
+        DateFormat('EEEE')
+            .format(DateTime.fromMillisecondsSinceEpoch(
+                data["daily"][i]["dt"] * 1000))
+            .substring(0, 3);
+    String desc = data["daily"][i]["weather"][0]["main"];
+    String iconcode = data['daily'][i]['weather'][0]['icon'];
+    var iconurl = "http://openweathermap.org/img/w/" + iconcode + ".png";
+    var hour = DateTime.now().hour;
+    // double.parse((data['current']['temp'] - 273).toString())
+    //     .toStringAsPrecision(2);
+    var temp;
+    if (hour >= 5 && hour < 12) {
+      temp = data["daily"][i]["temp"]["morn"];
+    }
+    if (hour >= 12 && hour < 17) {
+      temp = data["daily"][i]["temp"]["day"];
+    }
+    if (hour >= 17 && hour < 21) {
+      temp = data["daily"][i]["temp"]["eve"];
+    }
+    if (hour >= 21 || hour < 5) {
+      temp = data["daily"][i]["temp"]["night"];
+    }
+    futuredata.add(
+        {"dt": date, "desc": desc, "url": iconurl, "temp": temp.toString()});
+    historicalDates.add(date);
+    historicalDatesTemp.add((temp - 273).toStringAsPrecision(2));
+    historicdesc.add(desc);
+    iconurls.add(iconurl);
+    //print(futuredata);
+  }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -223,7 +295,7 @@ class _HomeState extends State<Home> {
             style: TextStyle(letterSpacing: 2, color: Colors.white),
           ),
         ),
-        body: weather == ''
+        body: historicalDates.length<7
             ? Center(child: CircularProgressIndicator())
             : Container(
                 padding: EdgeInsets.only(left: w * 0.02),
@@ -293,32 +365,43 @@ class _HomeState extends State<Home> {
                             .black, // The color to use when painting the line.
                       ),
                     ),
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'DATE',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 15),
-                            ),
-                            Text(
-                              'Desc',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 15),
-                            ),
-                            Text('Temp',
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Date',
                                 style: TextStyle(
-                                    fontWeight: FontWeight.w700, fontSize: 15)),
-                          ],
-                        ),
-                      ],
+                                    fontWeight: FontWeight.w700, fontSize: 15),
+                              ),
+                              SizedBox(
+                                width: w * 0.05,
+                              ),
+                              Text(
+                                'Desc',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 15),
+                              ),
+                              Text('Temp',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 15)),
+                            ],
+                          ),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                datetempcolumn(historicalDates),
+                                iconcolumn(iconurls, historicdesc),
+                                datetempcolumn(historicalDatesTemp)
+                              ])
+                        ],
+                      ),
                     ),
-                    datetemp(historicalDatesTemp[1], historicalDates[1],
-                        historicdesc[1], iconurls[1]),
-                    datetemp(historicalDatesTemp[0], historicalDates[0],
-                        historicdesc[0], iconurls[0]),
                     Text(
                       'Weather details',
                       style:
@@ -395,35 +478,166 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget datetemp(String temp, String date, String desc, String iconurl) {
-    return Row(
+  Widget datetempcolumn(List<String> s) {
+    print(s);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
+       // SizedBox(height: h*0.015,),
         Text(
-          date,
+          s[1],
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
         ),
-        SizedBox(
-          width: w * 0.17,
+        // SizedBox(
+        //   height: h*0.012,
+        // ),
+        Text(
+          s[0],
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        ),
+        // SizedBox(
+        //   height: h*0.012,
+        // ),
+        Text(
+          s[2],
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        ),
+        // SizedBox(
+        //   height: h*0.012,
+        // ),
+        Text(
+          s[3],
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        ),
+        // SizedBox(
+        //   height: h*0.012,
+        // ),
+        Text(
+          s[4],
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        ),
+        // SizedBox(
+        //   height: h*0.012,
+        // ),
+        Text(
+          s[5],
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        ),
+        // SizedBox(
+        //   height: h*0.012,
+        // ),
+        Text(
+          s[6],
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        ),
+      ],
+    );
+  }
+
+  Widget iconcolumn(List<String> imageurl, List<String> desc) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Image.network(
+              imageurl[1],
+              width: 30.0,
+              height: 15,
+            ),
+            Text(
+              desc[1],
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+            )
+          ],
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Image.network(
-              iconurl,
+              imageurl[0],
               width: 30.0,
-              height: 30,
+              height: 15,
             ),
             Text(
-              desc,
+              desc[0],
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
             )
           ],
         ),
-        SizedBox(
-          width: w * 0.31,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Image.network(
+              imageurl[2],
+              width: 30.0,
+              height: 15,
+            ),
+            Text(
+              desc[2],
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+            )
+          ],
         ),
-        Text(temp, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15))
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Image.network(
+              imageurl[3],
+              width: 30.0,
+              height: 15,
+            ),
+            Text(
+              desc[3],
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+            )
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Image.network(
+              imageurl[4],
+              width: 30.0,
+              height: 15,
+            ),
+            Text(
+              desc[4],
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+            )
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Image.network(
+              imageurl[5],
+              width: 30.0,
+              height: 15,
+            ),
+            Text(
+              desc[5],
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+            )
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Image.network(
+              imageurl[6],
+              width: 30.0,
+              height: 15,
+            ),
+            Text(
+              desc[6],
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+            )
+          ],
+        )
       ],
     );
   }
