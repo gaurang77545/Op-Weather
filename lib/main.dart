@@ -227,9 +227,7 @@ class _HomeState extends State<Home> {
     //   historicdesc.add(futuredata[i]['desc']!);
     // }
     print(historicalDates);
-    setState(() {
-      
-    });
+    setState(() {});
   }
 
   Future<void> addFutureData(int i) async {
@@ -289,176 +287,185 @@ class _HomeState extends State<Home> {
     h = size.height;
     w = size.width;
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            city,
-            style: TextStyle(letterSpacing: 2, color: Colors.white),
-          ),
+      appBar: AppBar(
+        title: Text(
+          city,
+          style: TextStyle(letterSpacing: 2, color: Colors.white),
         ),
-        body: historicalDates.length<7
-            ? Center(child: CircularProgressIndicator())
-            : Container(
-                padding: EdgeInsets.only(left: w * 0.02),
-                child: ListView(
-                  //crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: h * 0.1,
-                    ),
-                    Row(
-                      //crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          temperature,
+      ),
+      body: historicalDates.length < 7
+          ? Center(child: CircularProgressIndicator())
+          : Container(
+              padding: EdgeInsets.only(left: w * 0.02),
+              child: ListView(
+                //crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: h * 0.1,
+                  ),
+                  Row(
+                    //crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        temperature,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 60),
+                      ),
+                      SizedBox(
+                        width: w * 0.02,
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            '\u2103 ',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          SizedBox(
+                            height: h * 0.01,
+                          ),
+                          Text(
+                            weather,
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: h * 0.01,
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        date,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                      Text(max + '\u2103 ' + ' / ' + min + '\u2103 ',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 60),
-                        ),
-                        SizedBox(
-                          width: w * 0.02,
-                        ),
-                        Column(
+                              fontWeight: FontWeight.bold, fontSize: 13))
+                    ],
+                  ),
+                  SizedBox(
+                    height: h * 0.03,
+                  ),
+                  Container(
+                    height: h * 0.1,
+                    width: w * 0.5,
+                    child: const Divider(
+                      thickness: 2, // thickness of the line
+                      indent: 20, // empty space to the leading edge of divider.
+                      endIndent:
+                          20, // empty space to the trailing edge of the divider.
+                      color: Colors
+                          .black, // The color to use when painting the line.
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '\u2103 ',
-                              style: TextStyle(fontSize: 20),
+                              'Date',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 15),
                             ),
                             SizedBox(
-                              height: h * 0.01,
+                              width: w * 0.05,
                             ),
                             Text(
-                              weather,
-                              style: TextStyle(fontSize: 20),
+                              'Desc',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 15),
                             ),
+                            Text('Temp',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 15)),
                           ],
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: h * 0.01,
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          date,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 13),
                         ),
-                        Text(max + '\u2103 ' + ' / ' + min + '\u2103 ',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 13))
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              datetempcolumn(historicalDates),
+                              iconcolumn(iconurls, historicdesc),
+                              datetempcolumn(historicalDatesTemp)
+                            ])
                       ],
                     ),
-                    SizedBox(
-                      height: h * 0.03,
+                  ),
+                  Text(
+                    'Weather details',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(
+                    height: h * 0.03,
+                  ),
+                  Container(
+                    width: w - w * 0.03,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        details(
+                            'Apparent temperature', apparenttemp + '\u2103 '),
+                        SizedBox(
+                          width: w * 0.1,
+                        ),
+                        details('Humidity', humidity + ' %'),
+                      ],
                     ),
-                    Container(
-                      height: h * 0.1,
-                      width: w * 0.5,
-                      child: const Divider(
-                        thickness: 2, // thickness of the line
-                        indent:
-                            20, // empty space to the leading edge of divider.
-                        endIndent:
-                            20, // empty space to the trailing edge of the divider.
-                        color: Colors
-                            .black, // The color to use when painting the line.
-                      ),
+                  ),
+                  SizedBox(
+                    height: h * 0.03,
+                  ),
+                  Container(
+                    width: w - w * 0.03,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        details('Visibility', visibility + ' km '),
+                        SizedBox(
+                          width: w * 0.3,
+                        ),
+                        details('Air Pressure', airpressure + ' hPa '),
+                      ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Date',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w700, fontSize: 15),
-                              ),
-                              SizedBox(
-                                width: w * 0.05,
-                              ),
-                              Text(
-                                'Desc',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w700, fontSize: 15),
-                              ),
-                              Text('Temp',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 15)),
-                            ],
-                          ),
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                datetempcolumn(historicalDates),
-                                iconcolumn(iconurls, historicdesc),
-                                datetempcolumn(historicalDatesTemp)
-                              ])
-                        ],
-                      ),
+                  ),
+                  SizedBox(
+                    height: h * 0.03,
+                  ),
+                  Container(
+                    width: w - w * 0.03,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        details('Wind speed', windspeed + ' m/s'),
+                        SizedBox(
+                          width: w * 0.3,
+                        ),
+                        details('Cloudiness', clouds + ' % '),
+                      ],
                     ),
-                    Text(
-                      'Weather details',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(
-                      height: h * 0.03,
-                    ),
-                    Container(
-                      width: w - w * 0.03,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          details(
-                              'Apparent temperature', apparenttemp + '\u2103 '),
-                          SizedBox(
-                            width: w * 0.1,
-                          ),
-                          details('Humidity', humidity + ' %'),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: h * 0.03,
-                    ),
-                    Container(
-                      width: w - w * 0.03,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          details('Visibility', visibility + ' km '),
-                          SizedBox(
-                            width: w * 0.3,
-                          ),
-                          details('Air Pressure', airpressure + ' hPa '),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: h * 0.03,
-                    ),
-                    Container(
-                      width: w - w * 0.03,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          details('Wind speed', windspeed + ' m/s'),
-                          SizedBox(
-                            width: w * 0.3,
-                          ),
-                          details('Cloudiness', clouds + ' % '),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ));
+                  ),
+                ],
+              ),
+            ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () async {
+          final response = await get(Uri.parse(
+              'http://192.168.174.1:5000/gonda')); //getting the response from our backend server script
+          print(response);
+          final decoded = json.decode(response.body) as Map<String,
+              dynamic>; //converting it from json to key value pair
+          print(decoded);
+        },
+      ),
+    );
   }
 
   Widget details(String title, String contents) {
@@ -484,7 +491,7 @@ class _HomeState extends State<Home> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-       // SizedBox(height: h*0.015,),
+        // SizedBox(height: h*0.015,),
         Text(
           s[1],
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
