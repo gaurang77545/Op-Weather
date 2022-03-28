@@ -457,8 +457,8 @@ class _HomeState extends State<Home> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () async {
-          final response = await get(Uri.parse(
-              'http://192.168.174.1:5000/gonda')); //getting the response from our backend server script
+          print('Hello');
+          final response = await get(Uri.parse('http://192.168.174.1:5000')); //getting the response from our backend server script
           print(response);
           final decoded = json.decode(response.body) as Map<String,
               dynamic>; //converting it from json to key value pair

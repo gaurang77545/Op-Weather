@@ -32,7 +32,7 @@ app = Flask(__name__) #intance of our flask application
 # def index():
 #     return jsonify({'greetings' : 'Hi! this is python'}) #returning key-value pair in json format
 
-@app.route('/gonda', methods = ['GET'])
+@app.route('/', methods = ['GET'])
 def index():
     print('reached')
     return jsonify({'greetings' : 'Hi! this is gonda'}) #returning key-value pair in json format
