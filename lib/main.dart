@@ -8,6 +8,7 @@ import 'package:http/http.dart';
 import 'package:date_format/date_format.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:op/predictionscreen.dart';
 
 void main() => runApp(new MyApp());
 
@@ -372,7 +373,7 @@ class _HomeState extends State<Home> {
                             Text(
                               'Date',
                               style: TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 15),
+                                  fontWeight: FontWeight.w700, fontSize: 20),
                             ),
                             SizedBox(
                               width: w * 0.05,
@@ -380,11 +381,11 @@ class _HomeState extends State<Home> {
                             Text(
                               'Desc',
                               style: TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 15),
+                                  fontWeight: FontWeight.w700, fontSize: 20),
                             ),
                             Text('Temp',
                                 style: TextStyle(
-                                    fontWeight: FontWeight.w700, fontSize: 15)),
+                                    fontWeight: FontWeight.w700, fontSize: 20)),
                           ],
                         ),
                         Row(
@@ -454,18 +455,34 @@ class _HomeState extends State<Home> {
                 ],
               ),
             ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+      floatingActionButton: FloatingActionButton.extended(
+        label: Text('Predict'),
+        icon: Icon(Icons.thermostat),
         onPressed: () async {
           print('Hello');
-          final response = await get(Uri.parse('http://192.168.174.1:5000')); //getting the response from our backend server script
+          final response = await get(Uri.parse(
+              'http://10.0.2.2:5000/')); //getting the response from our backend server script
           print(response);
           final decoded = json.decode(response.body) as Map<String,
               dynamic>; //converting it from json to key value pair
           print(decoded);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PredictionScreen(
+                    modifylist(decoded['prediction']) )),
+          );
         },
       ),
     );
+  }
+
+  List<Map<String, String>> modifylist(List<dynamic> l) {
+    List<Map<String, String>> ml=[];
+    for (int i = 0; i < l.length; i++) {
+      ml.add({'date': l[i]['date'], 'temperature': l[i]['temperature']});
+    }
+    return ml;
   }
 
   Widget details(String title, String contents) {
@@ -494,49 +511,49 @@ class _HomeState extends State<Home> {
         // SizedBox(height: h*0.015,),
         Text(
           s[1],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[0],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[2],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[3],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[4],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[5],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[6],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
       ],
     );
@@ -553,11 +570,11 @@ class _HomeState extends State<Home> {
             Image.network(
               imageurl[1],
               width: 30.0,
-              height: 15,
+              height: 20,
             ),
             Text(
               desc[1],
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
             )
           ],
         ),
@@ -567,11 +584,11 @@ class _HomeState extends State<Home> {
             Image.network(
               imageurl[0],
               width: 30.0,
-              height: 15,
+              height: 20,
             ),
             Text(
               desc[0],
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
             )
           ],
         ),
@@ -581,11 +598,11 @@ class _HomeState extends State<Home> {
             Image.network(
               imageurl[2],
               width: 30.0,
-              height: 15,
+              height: 20,
             ),
             Text(
               desc[2],
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
             )
           ],
         ),
@@ -595,11 +612,11 @@ class _HomeState extends State<Home> {
             Image.network(
               imageurl[3],
               width: 30.0,
-              height: 15,
+              height: 20,
             ),
             Text(
               desc[3],
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
             )
           ],
         ),
@@ -609,11 +626,11 @@ class _HomeState extends State<Home> {
             Image.network(
               imageurl[4],
               width: 30.0,
-              height: 15,
+              height: 20,
             ),
             Text(
               desc[4],
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
             )
           ],
         ),
@@ -623,11 +640,11 @@ class _HomeState extends State<Home> {
             Image.network(
               imageurl[5],
               width: 30.0,
-              height: 15,
+              height: 20,
             ),
             Text(
               desc[5],
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
             )
           ],
         ),
@@ -637,11 +654,11 @@ class _HomeState extends State<Home> {
             Image.network(
               imageurl[6],
               width: 30.0,
-              height: 15,
+              height: 20,
             ),
             Text(
               desc[6],
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
             )
           ],
         )

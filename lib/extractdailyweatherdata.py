@@ -111,7 +111,7 @@ api_key = "b00a6fcec885b5e53be85ac4d7847543"
 #city_name = input("Enter city name : ")
 
 # API url
-weather_url = 'https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=37.4219983&lon=-122.084&dt=1647952953&appid=b00a6fcec885b5e53be85ac4d7847543'
+weather_url = 'https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=37.4219983&lon=-122.084&dt=1648581452&appid=b00a6fcec885b5e53be85ac4d7847543'
 
 # Get the response from weather url
 response = requests.get(weather_url)

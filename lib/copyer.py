@@ -25,19 +25,19 @@ from sklearn.linear_model import LinearRegression
 from flask import Flask,jsonify
 
 
-app = Flask(__name__) #intance of our flask application 
+# app = Flask(__name__) #intance of our flask application 
 
-#Route '/' to facilitate get request from our flutter app
+# #Route '/' to facilitate get request from our flutter app
+# # @app.route('/', methods = ['GET'])
+# # def index():
+# #     return jsonify({'greetings' : 'Hi! this is python'}) #returning key-value pair in json format
+
 # @app.route('/', methods = ['GET'])
 # def index():
-#     return jsonify({'greetings' : 'Hi! this is python'}) #returning key-value pair in json format
-
-@app.route('/', methods = ['GET'])
-def index():
-    print('reached')
-    return jsonify({'greetings' : 'Hi! this is gonda'}) #returning key-value pair in json format
-if __name__ == "__main__":
-    app.run(debug = True) #debug will allow changes without shutting down the server 
+#     print('reached')
+#     return jsonify({'greetings' : 'Hi! this is gonda'}) #returning key-value pair in json format
+# if __name__ == "__main__":
+#     app.run(debug = True) #debug will allow changes without shutting down the server 
 
 def writecsv(dte, i):
     dt = str(int(dte))
