@@ -32,16 +32,18 @@ app = Flask(__name__) #intance of our flask application
 # def index():
 #     return jsonify({'greetings' : 'Hi! this is python'}) #returning key-value pair in json format
 x=[]
-@app.route('/', methods = ['GET'])
-def index():
-    print('reached')
+@app.route('/<string:latitude>/<string:longitude>/<string:currentdate>', methods = ['GET'])
+def index(latitude,longitude,currentdate):
+    # print('reached')
+    
+    # print(latitude+longitude+'   '+currentdate)
     api_key = "b00a6fcec885b5e53be85ac4d7847543"
 
     # Get city name from user
     #city_name = input("Enter city name : ")
 
     # API url
-    weather_url = 'https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=37.4219983&lon=-122.084&dt=1648581452&appid=b00a6fcec885b5e53be85ac4d7847543'
+    weather_url = 'https://api.openweathermap.org/data/2.5/onecall/timemachine?lat='+latitude+'&lon='+longitude+'&dt='+currentdate+'&appid=b00a6fcec885b5e53be85ac4d7847543'
 
     # Get the response from weather url
     response = requests.get(weather_url)
@@ -55,11 +57,11 @@ def index():
     today_minusthree = datetime.timestamp(datetime.today() - timedelta(days=3))
     today_minusfour = datetime.timestamp(datetime.today() - timedelta(days=4))
     today_minusfive = datetime.timestamp(datetime.today() - timedelta(days=5))
-    writecsv(today_minusone, 1)
-    writecsv(today_minustwo, 0)
-    writecsv(today_minusthree, 0)
-    writecsv(today_minusfour, 0)
-    writecsv(today_minusfive, 0)
+    writecsv(today_minusone, 1,latitude,longitude)
+    writecsv(today_minustwo, 0,latitude,longitude)
+    writecsv(today_minusthree, 0,latitude,longitude)
+    writecsv(today_minusfour, 0,latitude,longitude)
+    writecsv(today_minusfive, 0,latitude,longitude)
     train_data()
     # predict_weather(today_minusone)
 
@@ -85,17 +87,16 @@ def index():
     predict_weather(today_plusthree)
     predict_weather(today_plusfour)
     predict_weather(today_plusfive)
-    print(x)
+    # print(x)
     # print(todaytimestamp)
-    print(weather_data["current"])
+    # print(weather_data["current"])
     return jsonify({'prediction' : x}) #returning key-value pair in json format
 # if __name__ == "__main__":
 #     app.run(debug = True) #debug will allow changes without shutting down the server 
 
-def writecsv(dte, i):
+def writecsv(dte, i,latitude,longitude):
     dt = str(int(dte))
-    combinedurl = 'https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=37.4219983&lon=-122.084&dt=' + \
-        dt+'&appid=b00a6fcec885b5e53be85ac4d7847543'
+    combinedurl = 'https://api.openweathermap.org/data/2.5/onecall/timemachine?lat='+latitude+'&lon='+longitude+'&dt='+dt+'&appid=b00a6fcec885b5e53be85ac4d7847543'
     response = requests.get(combinedurl)
     # response will be in json format and we need to change it to pythonic format
     weather_data = response.json()
@@ -149,7 +150,7 @@ def predict_weather(dt):
     predicted=str(clf.predict(np.array(dt).reshape(-1,1))[0][0])
     # actual= str(get_the_weather(int(dt)))
     print("The temperature is predicted to be: " + str(clf.predict(np.array(dt).reshape(-1,1))[0][0]))
-    # print("The temperature was actually: " + str(get_the_weather(int(dt))))
+    #print("The temperature was actually: " + str(get_the_weather(int(dt))))
     print("-" * 48)
     print("\n")
     x.append({'temperature':str(predicted),'date':str(datetime.fromtimestamp(dt))})
@@ -177,4 +178,3 @@ def train_data():
     print ("Mean Squared Error is"+str(mean_squared_error(y_test, pred)))
     joblib.dump(clf, 'weather_predictor.pkl')
     
-# Enter your API key

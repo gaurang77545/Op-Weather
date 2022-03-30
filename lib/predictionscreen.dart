@@ -73,7 +73,7 @@ class _PredictionScreenState extends State<PredictionScreen> {
 
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    print(Position);
+    //print(Position);
     try {
       List<Placemark> placemarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
@@ -87,32 +87,41 @@ class _PredictionScreenState extends State<PredictionScreen> {
         city = place.locality.toString();
       });
     } catch (e) {
-      print(e);
+      //print(e);
     }
   }
 
   void dateformatting() {
     for (int i = 0; i < widget.prediction.length; i++) {
-      String date = DateTime.parse(widget.prediction[i]['date']!).day.toString() +
-          '  ' +
-          DateFormat.MMMM().format(DateTime.parse(widget.prediction[i]['date']!)).toString() +
-          '  ' +
-          DateFormat('EEEE')
-              .format(DateTime.parse(widget.prediction[i]['date']!))
-              .toString()
-              .substring(0, 3);
+      String date =
+          DateTime.parse(widget.prediction[i]['date']!).day.toString() +
+              '  ' +
+              DateFormat.MMMM()
+                  .format(DateTime.parse(widget.prediction[i]['date']!))
+                  .toString() +
+              '  ' +
+              DateFormat('EEEE')
+                  .format(DateTime.parse(widget.prediction[i]['date']!))
+                  .toString()
+                  .substring(0, 3);
       predictiondates.add(date);
     }
-    print(predictiondates);
+    //print(predictiondates);
   }
 
   void tempformatting() {
     for (int i = 0; i < widget.prediction.length; i++) {
-      String temp = double.parse(widget.prediction[i]['temperature']!).toStringAsFixed(2);
+      String temp =
+          double.parse(widget.prediction[i]['temperature']!).toStringAsFixed(2);
       predictedtemperatures.add(temp);
     }
   }
-
+  @override
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -122,13 +131,17 @@ class _PredictionScreenState extends State<PredictionScreen> {
         ? CircularProgressIndicator()
         : Scaffold(
             appBar: AppBar(
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
               title: Text(
                 city + '  Prediction',
                 style: TextStyle(letterSpacing: 2, color: Colors.white),
               ),
             ),
             body: Padding(
-              padding:  EdgeInsets.only(right:w*0.1,left: w*0.1),
+              padding: EdgeInsets.only(right: w * 0.1, left: w * 0.1),
               child: Column(
                 children: [
                   Row(
@@ -161,7 +174,7 @@ class _PredictionScreenState extends State<PredictionScreen> {
   }
 
   Widget datetempcolumn(List<String> s) {
-    print(s);
+    //print(s);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -202,11 +215,10 @@ class _PredictionScreenState extends State<PredictionScreen> {
         // SizedBox(
         //   height: h*0.012,
         // ),
-        
+
         // SizedBox(
         //   height: h*0.012,
         // ),
-        
       ],
     );
   }

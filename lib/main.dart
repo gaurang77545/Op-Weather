@@ -29,6 +29,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   double h = 0.0, w = 0.0;
+  bool isLoading = false;
   List<String> months = [
     'jan',
     'feb',
@@ -45,6 +46,7 @@ class _HomeState extends State<Home> {
   ];
   String currentAddress = 'My Address';
   Position? currentposition;
+  String timestamp = '';
   String temperature = 'Weather';
   String weather = '';
   String city = '';
@@ -69,6 +71,9 @@ class _HomeState extends State<Home> {
   List<Map<String, String>> futuredata = [];
   @override
   void initState() {
+    setState(() {
+      isLoading = true;
+    });
     // TODO: implement initState
     _determinePosition();
     super.initState();
@@ -99,7 +104,7 @@ class _HomeState extends State<Home> {
 
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    print(Position);
+    //print(Position);
     try {
       List<Placemark> placemarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
@@ -115,7 +120,7 @@ class _HomeState extends State<Home> {
       await getData();
       getFuturedata();
     } catch (e) {
-      print(e);
+      //print(e);
     }
   }
 
@@ -146,9 +151,9 @@ class _HomeState extends State<Home> {
       //     .toString());
       historicalDates.add(date);
     }
-    // print(historicalDates);
-    print(iconurls);
-    // print(url);
+    // //print(historicalDates);
+    //print(iconurls);
+    // //print(url);
     Response response = await get(Uri.parse(url));
     Map data = jsonDecode(response.body);
     String temp = double.parse((data['main']['temp'] - 273).toString())
@@ -172,11 +177,11 @@ class _HomeState extends State<Home> {
         double.parse((data['wind']['speed']).toString()).toString();
     String cloudso =
         double.parse((data['clouds']['all']).toString()).toString();
-    print(temp);
+    //print(temp);
 
-    // print(DateTime.fromMillisecondsSinceEpoch(1647960048 * 1000));
-    // print(DateTime.fromMillisecondsSinceEpoch(1648065600 * 1000));
-    // print(DateTime.fromMillisecondsSinceEpoch(1648152000 * 1000));
+    // //print(DateTime.fromMillisecondsSinceEpoch(1647960048 * 1000));
+    // //print(DateTime.fromMillisecondsSinceEpoch(1648065600 * 1000));
+    // //print(DateTime.fromMillisecondsSinceEpoch(1648152000 * 1000));
 
     setState(() {
       temperature = temp;
@@ -202,7 +207,7 @@ class _HomeState extends State<Home> {
             timestamp +
             '&appid=b00a6fcec885b5e53be85ac4d7847543';
 
-    print(urlhistory);
+    //print(urlhistory);
     Response response = await get(Uri.parse(urlhistory));
     Map data = jsonDecode(response.body);
     String temp = double.parse((data['current']['temp'] - 273).toString())
@@ -227,8 +232,10 @@ class _HomeState extends State<Home> {
     //   iconurls.add(futuredata[i]['url']!);
     //   historicdesc.add(futuredata[i]['desc']!);
     // }
-    print(historicalDates);
-    setState(() {});
+    //print(historicalDates);
+    setState(() {
+      isLoading = false;
+    });
   }
 
   Future<void> addFutureData(int i) async {
@@ -279,7 +286,7 @@ class _HomeState extends State<Home> {
     historicalDatesTemp.add((temp - 273).toStringAsPrecision(2));
     historicdesc.add(desc);
     iconurls.add(iconurl);
-    //print(futuredata);
+    ////print(futuredata);
   }
 
   @override
@@ -287,16 +294,64 @@ class _HomeState extends State<Home> {
     var size = MediaQuery.of(context).size;
     h = size.height;
     w = size.width;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          city,
-          style: TextStyle(letterSpacing: 2, color: Colors.white),
-        ),
-      ),
-      body: historicalDates.length < 7
-          ? Center(child: CircularProgressIndicator())
-          : Container(
+    return  isLoading
+        ? Scaffold(
+            body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Center(child: CircularProgressIndicator()),
+              SizedBox(
+                height: h * 0.05,
+              ),
+              Text(
+                'LOADING',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              )
+            ],
+          ))
+        : Scaffold(
+            appBar: AppBar(
+              title: Text(
+                city,
+                style: TextStyle(letterSpacing: 2, color: Colors.white),
+              ),
+              actions: [
+              FloatingActionButton.extended(
+              label: Text('Predict'),
+              icon: Icon(Icons.thermostat),
+              onPressed: () async {
+                setState(() {
+                  isLoading = true;
+                });
+
+                //print('Hello');
+                final response = await get(Uri.parse('http://10.0.2.2:5000/' +
+                    currentposition!.latitude.toString() +
+                    '/' +
+                    currentposition!.longitude.toString() +
+                    '/' +
+                    Timestamp.fromDate(DateTime.now())
+                        .seconds
+                        .toString())); //getting the response from our backend server script
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    //print(response);
+                    final decoded = json.decode(response.body) as Map<String,
+                        dynamic>; //converting it from json to key value pair
+                    //print(decoded);
+                    return PredictionScreen(modifylist(decoded['prediction']));
+                  }),
+                );
+                 setState(() {
+                     isLoading = false;
+                });
+              },
+            ),
+              ],
+            ),
+            body: Container(
               padding: EdgeInsets.only(left: w * 0.02),
               child: ListView(
                 //crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,15 +396,15 @@ class _HomeState extends State<Home> {
                       Text(
                         date,
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 13),
+                            fontWeight: FontWeight.bold, fontSize: 17),
                       ),
                       Text(max + '\u2103 ' + ' / ' + min + '\u2103 ',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 13))
+                              fontWeight: FontWeight.bold, fontSize: 17))
                     ],
                   ),
                   SizedBox(
-                    height: h * 0.03,
+                    height: h * 0.015,
                   ),
                   Container(
                     height: h * 0.1,
@@ -367,13 +422,14 @@ class _HomeState extends State<Home> {
                     padding: const EdgeInsets.only(right: 8.0),
                     child: Column(
                       children: [
+                        SizedBox(height: h*0.015,),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               'Date',
                               style: TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 20),
+                                  fontWeight: FontWeight.w700, fontSize: 20,letterSpacing: 2),
                             ),
                             SizedBox(
                               width: w * 0.05,
@@ -381,13 +437,14 @@ class _HomeState extends State<Home> {
                             Text(
                               'Desc',
                               style: TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 20),
+                                  fontWeight: FontWeight.w700, fontSize: 20,letterSpacing: 2),
                             ),
                             Text('Temp',
                                 style: TextStyle(
-                                    fontWeight: FontWeight.w700, fontSize: 20)),
+                                    fontWeight: FontWeight.w700, fontSize: 20,letterSpacing: 2)),
                           ],
                         ),
+                        SizedBox(height: h*0.02,),
                         Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,9 +456,10 @@ class _HomeState extends State<Home> {
                       ],
                     ),
                   ),
+                  SizedBox(height: h*0.05,),
                   Text(
                     'Weather details',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,letterSpacing: 2),
                   ),
                   SizedBox(
                     height: h * 0.03,
@@ -455,30 +513,12 @@ class _HomeState extends State<Home> {
                 ],
               ),
             ),
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text('Predict'),
-        icon: Icon(Icons.thermostat),
-        onPressed: () async {
-          print('Hello');
-          final response = await get(Uri.parse(
-              'http://10.0.2.2:5000/')); //getting the response from our backend server script
-          print(response);
-          final decoded = json.decode(response.body) as Map<String,
-              dynamic>; //converting it from json to key value pair
-          print(decoded);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => PredictionScreen(
-                    modifylist(decoded['prediction']) )),
+            
           );
-        },
-      ),
-    );
   }
 
   List<Map<String, String>> modifylist(List<dynamic> l) {
-    List<Map<String, String>> ml=[];
+    List<Map<String, String>> ml = [];
     for (int i = 0; i < l.length; i++) {
       ml.add({'date': l[i]['date'], 'temperature': l[i]['temperature']});
     }
@@ -503,7 +543,7 @@ class _HomeState extends State<Home> {
   }
 
   Widget datetempcolumn(List<String> s) {
-    print(s);
+    //print(s);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
