@@ -29,6 +29,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   double h = 0.0, w = 0.0;
+  double kh = 1 / 759.2727272727273;
+  double kw = 1 / 392.72727272727275;
   bool isLoading = false;
   List<String> months = [
     'jan',
@@ -306,7 +308,7 @@ class _HomeState extends State<Home> {
               ),
               Text(
                 'LOADING',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20*kh*h),
               )
             ],
           ))
@@ -314,7 +316,7 @@ class _HomeState extends State<Home> {
             appBar: AppBar(
               title: Text(
                 city,
-                style: TextStyle(letterSpacing: 2, color: Colors.white),
+                style: TextStyle(letterSpacing: 2*kw*w, color: Colors.white),
               ),
               actions: [
               FloatingActionButton.extended(
@@ -366,7 +368,7 @@ class _HomeState extends State<Home> {
                       Text(
                         temperature,
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 60),
+                            fontWeight: FontWeight.bold, fontSize: 60*kh*h),
                       ),
                       SizedBox(
                         width: w * 0.02,
@@ -375,14 +377,14 @@ class _HomeState extends State<Home> {
                         children: [
                           Text(
                             '\u2103 ',
-                            style: TextStyle(fontSize: 20),
+                            style: TextStyle(fontSize: 20*kh*h),
                           ),
                           SizedBox(
                             height: h * 0.01,
                           ),
                           Text(
                             weather,
-                            style: TextStyle(fontSize: 20),
+                            style: TextStyle(fontSize: 20*kh*h),
                           ),
                         ],
                       )
@@ -396,11 +398,11 @@ class _HomeState extends State<Home> {
                       Text(
                         date,
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 17),
+                            fontWeight: FontWeight.bold, fontSize: 17*kh*h),
                       ),
                       Text(max + '\u2103 ' + ' / ' + min + '\u2103 ',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 17))
+                              fontWeight: FontWeight.bold, fontSize: 17*kh*h))
                     ],
                   ),
                   SizedBox(
@@ -409,17 +411,17 @@ class _HomeState extends State<Home> {
                   Container(
                     height: h * 0.1,
                     width: w * 0.5,
-                    child: const Divider(
-                      thickness: 2, // thickness of the line
-                      indent: 20, // empty space to the leading edge of divider.
+                    child:  Divider(
+                      thickness: 2*kh*h, // thickness of the line
+                      indent: 20*kw*w, // empty space to the leading edge of divider.
                       endIndent:
-                          20, // empty space to the trailing edge of the divider.
+                          20*kw*w, // empty space to the trailing edge of the divider.
                       color: Colors
                           .black, // The color to use when painting the line.
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
+                    padding:  EdgeInsets.only(right: 8.0*kw*w),
                     child: Column(
                       children: [
                         SizedBox(height: h*0.015,),
@@ -429,7 +431,7 @@ class _HomeState extends State<Home> {
                             Text(
                               'Date',
                               style: TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 20,letterSpacing: 2),
+                                  fontWeight: FontWeight.w700, fontSize: 20*kh*h,letterSpacing: 2*kw*w),
                             ),
                             SizedBox(
                               width: w * 0.05,
@@ -437,11 +439,11 @@ class _HomeState extends State<Home> {
                             Text(
                               'Desc',
                               style: TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 20,letterSpacing: 2),
+                                  fontWeight: FontWeight.w700, fontSize: 20*kh*h,letterSpacing: 2*kw*w),
                             ),
                             Text('Temp',
                                 style: TextStyle(
-                                    fontWeight: FontWeight.w700, fontSize: 20,letterSpacing: 2)),
+                                    fontWeight: FontWeight.w700, fontSize: 20*kh*h,letterSpacing: 2*kw*w)),
                           ],
                         ),
                         SizedBox(height: h*0.02,),
@@ -459,7 +461,7 @@ class _HomeState extends State<Home> {
                   SizedBox(height: h*0.05,),
                   Text(
                     'Weather details',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,letterSpacing: 2),
+                    style: TextStyle(fontSize: 22*kh*h, fontWeight: FontWeight.bold,letterSpacing: 2*kw*w),
                   ),
                   SizedBox(
                     height: h * 0.03,
@@ -531,13 +533,13 @@ class _HomeState extends State<Home> {
       children: [
         Text(
           title,
-          style: TextStyle(fontWeight: FontWeight.w300, fontSize: 18),
+          style: TextStyle(fontWeight: FontWeight.w300, fontSize: 18*kh*h),
         ),
         SizedBox(
           height: h * 0.01,
         ),
         Text(contents,
-            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 25))
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 25*kh*h))
       ],
     );
   }
@@ -551,49 +553,49 @@ class _HomeState extends State<Home> {
         // SizedBox(height: h*0.015,),
         Text(
           s[1],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20*kh*h),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[0],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20*kh*h),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[2],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20*kh*h),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[3],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20*kh*h),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[4],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20*kh*h),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[5],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20*kh*h),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[6],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20*kh*h),
         ),
       ],
     );
@@ -609,12 +611,12 @@ class _HomeState extends State<Home> {
           children: [
             Image.network(
               imageurl[1],
-              width: 30.0,
-              height: 20,
+              width: 30.0*kw*w,
+              height: 20*kh*h,
             ),
             Text(
               desc[1],
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20*kh*h),
             )
           ],
         ),
@@ -623,12 +625,12 @@ class _HomeState extends State<Home> {
           children: [
             Image.network(
               imageurl[0],
-              width: 30.0,
-              height: 20,
+              width: 30.0*kw*w,
+              height: 20*kh*h,
             ),
             Text(
               desc[0],
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20*kh*h),
             )
           ],
         ),
@@ -637,12 +639,12 @@ class _HomeState extends State<Home> {
           children: [
             Image.network(
               imageurl[2],
-              width: 30.0,
-              height: 20,
+              width: 30.0*kw*w,
+              height: 20*kh*h,
             ),
             Text(
               desc[2],
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20*kh*h),
             )
           ],
         ),
@@ -651,12 +653,12 @@ class _HomeState extends State<Home> {
           children: [
             Image.network(
               imageurl[3],
-              width: 30.0,
-              height: 20,
+              width: 30.0*kw*w,
+              height: 20*kh*h,
             ),
             Text(
               desc[3],
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20*kh*h),
             )
           ],
         ),
@@ -665,12 +667,12 @@ class _HomeState extends State<Home> {
           children: [
             Image.network(
               imageurl[4],
-              width: 30.0,
-              height: 20,
+              width: 30.0*kw*w,
+              height: 20*kh*h,
             ),
             Text(
               desc[4],
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20*kh*h),
             )
           ],
         ),
@@ -679,12 +681,12 @@ class _HomeState extends State<Home> {
           children: [
             Image.network(
               imageurl[5],
-              width: 30.0,
-              height: 20,
+              width: 30.0*kw*w,
+              height: 20*kh*h,
             ),
             Text(
               desc[5],
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20*kh*h),
             )
           ],
         ),
@@ -693,12 +695,12 @@ class _HomeState extends State<Home> {
           children: [
             Image.network(
               imageurl[6],
-              width: 30.0,
-              height: 20,
+              width: 30.0*kw*w,
+              height: 20*kh*h,
             ),
             Text(
               desc[6],
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20*kh*h),
             )
           ],
         )

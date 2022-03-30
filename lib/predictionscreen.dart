@@ -20,6 +20,8 @@ class PredictionScreen extends StatefulWidget {
 
 class _PredictionScreenState extends State<PredictionScreen> {
   double h = 0.0, w = 0.0;
+  double kh = 1 / 759.2727272727273;
+  double kw = 1 / 392.72727272727275;
   List<String> months = [
     'jan',
     'feb',
@@ -137,7 +139,7 @@ class _PredictionScreenState extends State<PredictionScreen> {
               ),
               title: Text(
                 city + '  Prediction',
-                style: TextStyle(letterSpacing: 2, color: Colors.white),
+                style: TextStyle(letterSpacing: 2*kw*w, color: Colors.white),
               ),
             ),
             body: Padding(
@@ -150,14 +152,14 @@ class _PredictionScreenState extends State<PredictionScreen> {
                       Text(
                         'Date',
                         style: TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 15),
+                            fontWeight: FontWeight.w700, fontSize: 15*kh*h),
                       ),
                       SizedBox(
                         width: w * 0.05,
                       ),
                       Text('Temp',
                           style: TextStyle(
-                              fontWeight: FontWeight.w700, fontSize: 15)),
+                              fontWeight: FontWeight.w700, fontSize: 15*kh*h)),
                     ],
                   ),
                   Row(
@@ -182,35 +184,35 @@ class _PredictionScreenState extends State<PredictionScreen> {
         // SizedBox(height: h*0.015,),
         Text(
           s[0],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15*kh*h),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[1],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15*kh*h),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[2],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15*kh*h),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[3],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15*kh*h),
         ),
         // SizedBox(
         //   height: h*0.012,
         // ),
         Text(
           s[4],
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15*kh*h),
         ),
         // SizedBox(
         //   height: h*0.012,
